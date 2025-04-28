@@ -8,6 +8,6 @@ class TestControler extends Controller
 {
     public function test()
     {
-        return 'Hello from Laravel!';
+        return 'Hello from Laravel)';
     }
 }
