@@ -1,17 +1,36 @@
 @extends('layouts.app')
-
 @section('content')
     <div class="container">
         <h1>Оплати</h1>
-        <a href="{{ route('payments.create') }}" class="btn btn-primary mb-3">+ Нова оплата</a>
+        <form class="row g-2 mb-3">
+            <div class="col">
+                <select name="rental_id" class="form-select">
+                    <option value="">– Оренда –</option>
+                    @foreach($rentals as $r)
+                        <option value="{{ $r->id }}" {{ ( $filters['rental_id'] ?? '' )==$r->id?'selected':'' }}>
+                            #{{ $r->id }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col"><input name="amount"  class="form-control" placeholder="Сума" value="{{ $filters['amount'] ?? '' }}"></div>
+            <div class="col"><input type="date" name="paid_at" class="form-control" value="{{ $filters['paid_at'] ?? '' }}"></div>
+            <div class="col"><input name="method" class="form-control" placeholder="Метод" value="{{ $filters['method'] ?? '' }}"></div>
+            <div class="col-auto"><button class="btn btn-primary">Фільтр</button></div>
+        </form>
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+        <form class="mb-3">
+            <label>Items/page:</label>
+            <input name="itemsPerPage" type="number" value="{{ $perPage }}" class="form-control d-inline-block w-auto">
+            <button class="btn btn-secondary btn-sm">OK</button>
+            @foreach($filters as $k=>$v)
+                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+            @endforeach
+        </form>
 
-        <table class="table">
-            <thead><tr><th>ID</th><th>Оренда</th><th>Сума</th><th>Дата</th><th>Метод</th><th>Дії</th></tr></thead>
-            <tbody>
+        <table class="table"><thead><tr>
+                <th>ID</th><th>Оренда</th><th>Сума</th><th>Дата</th><th>Метод</th>
+            </tr></thead><tbody>
             @foreach($payments as $p)
                 <tr>
                     <td>{{ $p->id }}</td>
@@ -19,17 +38,10 @@
                     <td>{{ $p->amount }}</td>
                     <td>{{ $p->paid_at }}</td>
                     <td>{{ $p->method }}</td>
-                    <td>
-                        <a href="{{ route('payments.show', $p) }}" class="btn btn-sm btn-info">Show</a>
-                        <a href="{{ route('payments.edit', $p) }}" class="btn btn-sm btn-warning">Edit</a>
-                        <form action="{{ route('payments.destroy', $p) }}" method="POST" class="d-inline">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-danger" onclick="return confirm('Видалити?')">Delete</button>
-                        </form>
-                    </td>
                 </tr>
             @endforeach
-            </tbody>
-        </table>
+            </tbody></table>
+
+        {{ $payments->links() }}
     </div>
 @endsection

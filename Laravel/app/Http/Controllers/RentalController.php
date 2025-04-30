@@ -9,11 +9,22 @@ use Illuminate\Http\Request;
 
 class RentalController extends Controller
 {
-    public function index()
+    public function index(Request $r)
     {
-        $rentals = Rental::with(['car', 'client'])->get();
-        return view('rentals.index', compact('rentals'));
+        $filters = $r->only('rent_from','rent_to','car_id','client_id');
+        $perPage = max(1,(int)$r->query('itemsPerPage',10));
+
+        $cars    = Car::all();
+        $clients = Client::all();
+
+        $rentals = Rental::with(['car','client'])
+            ->filter($filters)
+            ->paginate($perPage)
+            ->appends($filters + ['itemsPerPage'=>$perPage]);
+
+        return view('rentals.index',compact('rentals','filters','cars','clients','perPage'));
     }
+
 
     public function create()
     {

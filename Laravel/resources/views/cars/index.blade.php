@@ -1,21 +1,36 @@
 @extends('layouts.app')
-
 @section('content')
     <div class="container">
-        <h1>Автомобілі</h1>
-        <a href="{{ route('cars.create') }}" class="btn btn-primary mb-3">+ Новий автомобіль</a>
+        <h1>Авто</h1>
+        <form class="row g-2 mb-3">
+            <div class="col"><input name="brand" value="{{ $filters['brand'] ?? '' }}" class="form-control" placeholder="Марка"></div>
+            <div class="col"><input name="model" value="{{ $filters['model'] ?? '' }}" class="form-control" placeholder="Модель"></div>
+            <div class="col"><input name="year"  value="{{ $filters['year']  ?? '' }}" class="form-control" placeholder="Рік"></div>
+            <div class="col">
+                <select name="car_category_id" class="form-select">
+                    <option value="">– Категорія –</option>
+                    @foreach($categories as $c)
+                        <option value="{{ $c->id }}" {{ ( $filters['car_category_id'] ?? '' )==$c->id?'selected':'' }}>
+                            {{ $c->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-auto"><button class="btn btn-primary">Фільтр</button></div>
+        </form>
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+        <form class="mb-3">
+            <label>Items/page:</label>
+            <input name="itemsPerPage" type="number" value="{{ $perPage }}" class="form-control d-inline-block w-auto">
+            <button class="btn btn-secondary btn-sm">OK</button>
+            @foreach($filters as $k=>$v)
+                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+            @endforeach
+        </form>
 
-        <table class="table">
-            <thead>
-            <tr>
-                <th>ID</th><th>Марка</th><th>Модель</th><th>Рік</th><th>Категорія</th><th>Ціна/день</th><th>Дії</th>
-            </tr>
-            </thead>
-            <tbody>
+        <table class="table"><thead><tr>
+                <th>ID</th><th>Марка</th><th>Модель</th><th>Рік</th><th>Категорія</th><th>Ціна</th>
+            </tr></thead><tbody>
             @foreach($cars as $car)
                 <tr>
                     <td>{{ $car->id }}</td>
@@ -24,17 +39,10 @@
                     <td>{{ $car->year }}</td>
                     <td>{{ $car->category->name }}</td>
                     <td>{{ $car->price_per_day }}</td>
-                    <td>
-                        <a href="{{ route('cars.show', $car) }}" class="btn btn-sm btn-info">Show</a>
-                        <a href="{{ route('cars.edit', $car) }}" class="btn btn-sm btn-warning">Edit</a>
-                        <form action="{{ route('cars.destroy', $car) }}" method="POST" class="d-inline">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-danger" onclick="return confirm('Видалити?')">Delete</button>
-                        </form>
-                    </td>
                 </tr>
             @endforeach
-            </tbody>
-        </table>
+            </tbody></table>
+
+        {{ $cars->links() }}
     </div>
 @endsection

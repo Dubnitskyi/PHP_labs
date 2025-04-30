@@ -7,11 +7,18 @@ use Illuminate\Http\Request;
 
 class CarCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $r)
     {
-        $categories = CarCategory::all();
-        return view('car-categories.index', compact('categories'));
+        $filters = $r->only('name');
+        $perPage = max(1,(int)$r->query('itemsPerPage',10));
+
+        $cats = CarCategory::filter($filters)
+            ->paginate($perPage)
+            ->appends($filters + ['itemsPerPage'=>$perPage]);
+
+        return view('car-categories.index', compact('cats','filters','perPage'));
     }
+
 
     public function create()
     {

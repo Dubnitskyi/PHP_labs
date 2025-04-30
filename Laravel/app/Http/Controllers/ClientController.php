@@ -7,11 +7,18 @@ use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $r)
     {
-        $clients = Client::all();
-        return view('clients.index', compact('clients'));
+        $filters = $r->only('full_name','phone','email');
+        $perPage = max(1,(int)$r->query('itemsPerPage',10));
+
+        $clients = Client::filter($filters)
+            ->paginate($perPage)
+            ->appends($filters + ['itemsPerPage'=>$perPage]);
+
+        return view('clients.index',compact('clients','filters','perPage'));
     }
+
 
     public function create()
     {

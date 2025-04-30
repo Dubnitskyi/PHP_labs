@@ -8,11 +8,21 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    public function index()
+    public function index(Request $r)
     {
-        $payments = Payment::with('rental')->get();
-        return view('payments.index', compact('payments'));
+        $filters = $r->only('amount','paid_at','method','rental_id');
+        $perPage = max(1,(int)$r->query('itemsPerPage',10));
+
+        $rentals = Rental::all();
+
+        $payments = Payment::with('rental')
+            ->filter($filters)
+            ->paginate($perPage)
+            ->appends($filters + ['itemsPerPage'=>$perPage]);
+
+        return view('payments.index',compact('payments','filters','rentals','perPage'));
     }
+
 
     public function create()
     {
