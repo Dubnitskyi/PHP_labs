@@ -15,32 +15,32 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ClientController extends AbstractController
 {
     #[Route(name: 'app_client_index', methods: ['GET'])]
-    public function index(ClientRepository $clientRepository): Response
+    public function index(Request $r,PaginatorInterface $p)
     {
-        return $this->render('client/index.html.twig', [
-            'clients' => $clientRepository->findAll(),
-        ]);
-    }
+        $qb = $this->getDoctrine()->getRepo(Client::class)
+            ->createQueryBuilder('c');
 
-    #[Route('/new', name: 'app_client_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $client = new Client();
-        $form = $this->createForm(ClientForm::class, $client);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($client);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_client_index', [], Response::HTTP_SEE_OTHER);
+        $f=$this->createForm(ClientFilterType::class);
+        $f->handleRequest($r);
+        if($f->isSubmitted()&&$f->isValid()){
+            $d=$f->getData();
+            if($d['fullName'])
+                $qb->andWhere('c.fullName LIKE :n')->setParameter('n','%'.$d['fullName'].'%');
+            if($d['phone'])
+                $qb->andWhere('c.phone LIKE :p')->setParameter('p','%'.$d['phone'].'%');
+            if($d['email'])
+                $qb->andWhere('c.email LIKE :e')->setParameter('e','%'.$d['email'].'%');
         }
 
-        return $this->render('client/new.html.twig', [
-            'client' => $client,
-            'form' => $form,
+        $per=max(1,(int)$r->query->get('itemsPerPage',10));
+        $pg=$p->paginate($qb,$r->query->getInt('page',1),$per);
+
+        return $this->render('clients/index.html.twig',[
+            'filterForm'=>$f->createView(),
+            'pagination'=>$pg
         ]);
     }
+
 
     #[Route('/{id}', name: 'app_client_show', methods: ['GET'])]
     public function show(Client $client): Response

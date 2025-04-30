@@ -1,39 +1,28 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Client index{% endblock %}
-
 {% block body %}
-    <h1>Client index</h1>
+    {{ form_start(filterForm,{method:'get'}) }}
+    {{ form_row(filterForm.fullName) }}
+    {{ form_row(filterForm.phone) }}
+    {{ form_row(filterForm.email) }}
+    <button>Фільтрувати</button>
+    {{ form_end(filterForm) }}
 
-    <table class="table">
-        <thead>
+    <form method="get">
+        <label>Items/page:</label>
+        <input type="number" name="itemsPerPage" value="{{ pagination.getItemNumberPerPage }}">
+        <button>OK</button>
+    </form>
+
+    <table>
+        <tr><th>ID</th><th>ПІБ</th><th>Телефон</th><th>Email</th></tr>
+        {% for cli in pagination %}
             <tr>
-                <th>Id</th>
-                <th>FullName</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for client in clients %}
-            <tr>
-                <td>{{ client.id }}</td>
-                <td>{{ client.fullName }}</td>
-                <td>{{ client.phone }}</td>
-                <td>{{ client.email }}</td>
-                <td>
-                    <a href="{{ path('app_client_show', {'id': client.id}) }}">show</a>
-                    <a href="{{ path('app_client_edit', {'id': client.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
+                <td>{{ cli.id }}</td>
+                <td>{{ cli.fullName }}</td>
+                <td>{{ cli.phone }}</td>
+                <td>{{ cli.email }}</td>
             </tr>
         {% endfor %}
-        </tbody>
     </table>
-
-    <a href="{{ path('app_client_new') }}">Create new</a>
+    {{ knp_pagination_render(pagination) }}
 {% endblock %}

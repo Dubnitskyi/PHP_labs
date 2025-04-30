@@ -15,12 +15,30 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CarCategoryController extends AbstractController
 {
     #[Route(name: 'app_car_category_index', methods: ['GET'])]
-    public function index(CarCategoryRepository $carCategoryRepository): Response
+    public function index(Request $request, PaginatorInterface $paginator)
     {
-        return $this->render('car_category/index.html.twig', [
-            'car_categories' => $carCategoryRepository->findAll(),
+        $qb = $this->getDoctrine()->getRepository(CarCategory::class)
+            ->createQueryBuilder('c');
+
+        $form = $this->createForm(CarCategoryFilterType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $d = $form->getData();
+            if ($d['name']) {
+                $qb->andWhere('c.name LIKE :n')
+                    ->setParameter('n','%'.$d['name'].'%');
+            }
+        }
+
+        $perPage = max(1,(int)$request->query->get('itemsPerPage',10));
+        $pagination = $paginator->paginate($qb, $request->query->getInt('page',1), $perPage);
+
+        return $this->render('car_categories/index.html.twig', [
+            'filterForm'=>$form->createView(),
+            'pagination'=>$pagination
         ]);
     }
+
 
     #[Route('/new', name: 'app_car_category_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

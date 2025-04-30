@@ -1,41 +1,32 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Car index{% endblock %}
-
 {% block body %}
-    <h1>Car index</h1>
+    {{ form_start(filterForm, {method:'get'}) }}
+    {{ form_row(filterForm.brand) }}
+    {{ form_row(filterForm.model) }}
+    {{ form_row(filterForm.year) }}
+    {{ form_row(filterForm.category) }}
+    <button>Фільтрувати</button>
+    {{ form_end(filterForm) }}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Year</th>
-                <th>PricePerDay</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for car in cars %}
+    <form method="get">
+        <label>Items/page:</label>
+        <input type="number" name="itemsPerPage" value="{{ pagination.getItemNumberPerPage }}">
+        <button>OK</button>
+    </form>
+
+    <table>
+        <tr><th>ID</th><th>Марка</th><th>Модель</th><th>Рік</th><th>Категорія</th><th>Ціна</th></tr>
+        {% for car in pagination %}
             <tr>
                 <td>{{ car.id }}</td>
                 <td>{{ car.brand }}</td>
                 <td>{{ car.model }}</td>
                 <td>{{ car.year }}</td>
+                <td>{{ car.category.name }}</td>
                 <td>{{ car.pricePerDay }}</td>
-                <td>
-                    <a href="{{ path('app_car_show', {'id': car.id}) }}">show</a>
-                    <a href="{{ path('app_car_edit', {'id': car.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
             </tr>
         {% endfor %}
-        </tbody>
     </table>
 
-    <a href="{{ path('app_car_new') }}">Create new</a>
+    {{ knp_pagination_render(pagination) }}
 {% endblock %}

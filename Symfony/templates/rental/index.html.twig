@@ -1,37 +1,30 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Rental index{% endblock %}
-
 {% block body %}
-    <h1>Rental index</h1>
+    {{ form_start(filterForm,{method:'get'}) }}
+    {{ form_row(filterForm.rentFrom) }}
+    {{ form_row(filterForm.rentTo) }}
+    {{ form_row(filterForm.car) }}
+    {{ form_row(filterForm.client) }}
+    <button>Фільтрувати</button>
+    {{ form_end(filterForm) }}
 
-    <table class="table">
-        <thead>
+    <form method="get">
+        <label>Items/page:</label>
+        <input type="number" name="itemsPerPage" value="{{ pagination.getItemNumberPerPage }}">
+        <button>OK</button>
+    </form>
+
+    <table>
+        <tr><th>ID</th><th>Авто</th><th>Клієнт</th><th>З</th><th>До</th></tr>
+        {% for r in pagination %}
             <tr>
-                <th>Id</th>
-                <th>RentFrom</th>
-                <th>RentTo</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for rental in rentals %}
-            <tr>
-                <td>{{ rental.id }}</td>
-                <td>{{ rental.rentFrom ? rental.rentFrom|date('Y-m-d') : '' }}</td>
-                <td>{{ rental.rentTo ? rental.rentTo|date('Y-m-d') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_rental_show', {'id': rental.id}) }}">show</a>
-                    <a href="{{ path('app_rental_edit', {'id': rental.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
+                <td>{{ r.id }}</td>
+                <td>{{ r.car.brand }} {{ r.car.model }}</td>
+                <td>{{ r.client.fullName }}</td>
+                <td>{{ r.rentFrom|date('Y-m-d') }}</td>
+                <td>{{ r.rentTo|date('Y-m-d') }}</td>
             </tr>
         {% endfor %}
-        </tbody>
     </table>
-
-    <a href="{{ path('app_rental_new') }}">Create new</a>
+    {{ knp_pagination_render(pagination) }}
 {% endblock %}

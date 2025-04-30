@@ -15,12 +15,34 @@ use Symfony\Component\Routing\Attribute\Route;
 final class PaymentController extends AbstractController
 {
     #[Route(name: 'app_payment_index', methods: ['GET'])]
-    public function index(PaymentRepository $paymentRepository): Response
+    public function index(Request $r,PaginatorInterface $p)
     {
-        return $this->render('payment/index.html.twig', [
-            'payments' => $paymentRepository->findAll(),
+        $qb=$this->getDoctrine()->getRepo(Payment::class)
+            ->createQueryBuilder('p')
+            ->join('p.rental','r');
+
+        $f=$this->createForm(PaymentFilterType::class);
+        $f->handleRequest($r);
+        if($f->isSubmitted()&&$f->isValid()){
+            $d=$f->getData();
+            if($d['amount'])
+                $qb->andWhere('p.amount=:a')->setParameter('a',$d['amount']);
+            if($d['paidAt'])
+                $qb->andWhere('p.paidAt=:d')->setParameter('d',$d['paidAt']);
+            if($d['method'])
+                $qb->andWhere('p.method LIKE :m')->setParameter('m','%'.$d['method'].'%');
+            if($f->get('rental')->getData())
+                $qb->andWhere('r.id=:rid')->setParameter('rid',$f->get('rental')->getData());
+        }
+
+        $per=max(1,(int)$r->query->get('itemsPerPage',10));
+        $pg=$p->paginate($qb,$r->query->getInt('page',1),$per);
+
+        return $this->render('payments/index.html.twig',[
+            'filterForm'=>$f->createView(),'pagination'=>$pg
         ]);
     }
+
 
     #[Route('/new', name: 'app_payment_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

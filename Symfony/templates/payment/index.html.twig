@@ -1,39 +1,30 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Payment index{% endblock %}
-
 {% block body %}
-    <h1>Payment index</h1>
+    {{ form_start(filterForm,{method:'get'}) }}
+    {{ form_row(filterForm.amount) }}
+    {{ form_row(filterForm.paidAt) }}
+    {{ form_row(filterForm.method) }}
+    {{ form_row(filterForm.rental) }}
+    <button>Фільтрувати</button>
+    {{ form_end(filterForm) }}
 
-    <table class="table">
-        <thead>
+    <form method="get">
+        <label>Items/page:</label>
+        <input type="number" name="itemsPerPage" value="{{ pagination.getItemNumberPerPage }}">
+        <button>OK</button>
+    </form>
+
+    <table>
+        <tr><th>ID</th><th>Оренда#</th><th>Сума</th><th>Дата</th><th>Метод</th></tr>
+        {% for p in pagination %}
             <tr>
-                <th>Id</th>
-                <th>Amount</th>
-                <th>PaidAt</th>
-                <th>Method</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for payment in payments %}
-            <tr>
-                <td>{{ payment.id }}</td>
-                <td>{{ payment.amount }}</td>
-                <td>{{ payment.paidAt ? payment.paidAt|date('Y-m-d') : '' }}</td>
-                <td>{{ payment.method }}</td>
-                <td>
-                    <a href="{{ path('app_payment_show', {'id': payment.id}) }}">show</a>
-                    <a href="{{ path('app_payment_edit', {'id': payment.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
+                <td>{{ p.id }}</td>
+                <td>{{ p.rental.id }}</td>
+                <td>{{ p.amount }}</td>
+                <td>{{ p.paidAt|date('Y-m-d') }}</td>
+                <td>{{ p.method }}</td>
             </tr>
         {% endfor %}
-        </tbody>
     </table>
-
-    <a href="{{ path('app_payment_new') }}">Create new</a>
+    {{ knp_pagination_render(pagination) }}
 {% endblock %}

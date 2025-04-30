@@ -15,12 +15,35 @@ use Symfony\Component\Routing\Attribute\Route;
 final class RentalController extends AbstractController
 {
     #[Route(name: 'app_rental_index', methods: ['GET'])]
-    public function index(RentalRepository $rentalRepository): Response
+    public function index(Request $r,PaginatorInterface $p)
     {
-        return $this->render('rental/index.html.twig', [
-            'rentals' => $rentalRepository->findAll(),
+        $qb=$this->getDoctrine()->getRepo(Rental::class)
+            ->createQueryBuilder('r')
+            ->join('r.car','c')
+            ->join('r.client','cli');
+
+        $f=$this->createForm(RentalFilterType::class);
+        $f->handleRequest($r);
+        if($f->isSubmitted()&&$f->isValid()){
+            $d=$f->getData();
+            if($d['rentFrom'])
+                $qb->andWhere('r.rentFrom>=:f')->setParameter('f',$d['rentFrom']);
+            if($d['rentTo'])
+                $qb->andWhere('r.rentTo<=:t')->setParameter('t',$d['rentTo']);
+            if($f->get('car')->getData())
+                $qb->andWhere('c.model LIKE :m')->setParameter('m','%'.$f->get('car')->getData().'%');
+            if($f->get('client')->getData())
+                $qb->andWhere('cli.fullName LIKE :n')->setParameter('n','%'.$f->get('client')->getData().'%');
+        }
+
+        $per=max(1,(int)$r->query->get('itemsPerPage',10));
+        $pg=$p->paginate($qb,$r->query->getInt('page',1),$per);
+
+        return $this->render('rentals/index.html.twig',[
+            'filterForm'=>$f->createView(),'pagination'=>$pg
         ]);
     }
+
 
     #[Route('/new', name: 'app_rental_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
