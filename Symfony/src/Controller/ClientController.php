@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Form\ClientFilterType;
+
+use Knp\Component\Pager\PaginatorInterface;
 use App\Entity\Client;
 use App\Form\ClientForm;
 use App\Repository\ClientRepository;
@@ -11,14 +14,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/client')]
+#[Route('/clients')]
 final class ClientController extends AbstractController
 {
     #[Route(name: 'app_client_index', methods: ['GET'])]
-    public function index(Request $r,PaginatorInterface $p)
+    public function index(Request $r, PaginatorInterface $p, ClientRepository $repo)
     {
-        $qb = $this->getDoctrine()->getRepo(Client::class)
-            ->createQueryBuilder('c');
+        $qb = $repo->createQueryBuilder('c');
 
         $f=$this->createForm(ClientFilterType::class);
         $f->handleRequest($r);
@@ -45,8 +47,8 @@ final class ClientController extends AbstractController
     #[Route('/{id}', name: 'app_client_show', methods: ['GET'])]
     public function show(Client $client): Response
     {
-        return $this->render('client/show.html.twig', [
-            'client' => $client,
+        return $this->render('clients/show.html.twig', [
+            'clients' => $client,
         ]);
     }
 
@@ -62,8 +64,8 @@ final class ClientController extends AbstractController
             return $this->redirectToRoute('app_client_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('client/edit.html.twig', [
-            'client' => $client,
+        return $this->render('clients/edit.html.twig', [
+            'clients' => $client,
             'form' => $form,
         ]);
     }

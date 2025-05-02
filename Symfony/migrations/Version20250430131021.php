@@ -27,7 +27,7 @@ final class Version20250430131021 extends AbstractMigration
             CREATE TABLE car_category (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE client (id INT AUTO_INCREMENT NOT NULL, full_name VARCHAR(255) NOT NULL, phone VARCHAR(50) NOT NULL, email VARCHAR(100) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE clients (id INT AUTO_INCREMENT NOT NULL, full_name VARCHAR(255) NOT NULL, phone VARCHAR(50) NOT NULL, email VARCHAR(100) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE payment (id INT AUTO_INCREMENT NOT NULL, rental_id INT NOT NULL, amount DOUBLE PRECISION NOT NULL, paid_at DATE NOT NULL, method VARCHAR(50) NOT NULL, INDEX IDX_6D28840DA7CF2329 (rental_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -45,7 +45,7 @@ final class Version20250430131021 extends AbstractMigration
             ALTER TABLE payment ADD CONSTRAINT FK_6D28840DA7CF2329 FOREIGN KEY (rental_id) REFERENCES rental (id)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE rental ADD CONSTRAINT FK_1619C27D19EB6921 FOREIGN KEY (client_id) REFERENCES client (id)
+            ALTER TABLE rental ADD CONSTRAINT FK_1619C27D19EB6921 FOREIGN KEY (client_id) REFERENCES clients (id)
         SQL);
     }
 
@@ -68,7 +68,7 @@ final class Version20250430131021 extends AbstractMigration
             DROP TABLE car_category
         SQL);
         $this->addSql(<<<'SQL'
-            DROP TABLE client
+            DROP TABLE clients
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE payment

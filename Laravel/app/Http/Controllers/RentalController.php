@@ -17,7 +17,7 @@ class RentalController extends Controller
         $cars    = Car::all();
         $clients = Client::all();
 
-        $rentals = Rental::with(['car','client'])
+        $rentals = Rental::with(['car','clients'])
             ->filter($filters)
             ->paginate($perPage)
             ->appends($filters + ['itemsPerPage'=>$perPage]);
@@ -50,7 +50,7 @@ class RentalController extends Controller
 
     public function show(Rental $rental)
     {
-        $rental->load('car','client');
+        $rental->load('car','clients');
         return view('rentals.show', compact('rental'));
     }
 

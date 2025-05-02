@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
 use App\Entity\Payment;
 use App\Form\PaymentForm;
 use App\Repository\PaymentRepository;

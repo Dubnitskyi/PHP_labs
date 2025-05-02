@@ -14,7 +14,7 @@ class RentalFilterType extends AbstractType
             ->add('rentFrom', DateType::class, ['required'=>false,'widget'=>'single_text'])
             ->add('rentTo',   DateType::class, ['required'=>false,'widget'=>'single_text'])
             ->add('car',      TextType::class, ['required'=>false,'mapped'=>false])
-            ->add('client',   TextType::class, ['required'=>false,'mapped'=>false])
+            ->add('clients',   TextType::class, ['required'=>false,'mapped'=>false])
         ;
     }
 }

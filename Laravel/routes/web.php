@@ -13,8 +13,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test', [HelloController::class, 'test']);
-
 Route::resource('posts', PostController::class);
 
 Route::resource('car-categories',CarCategoryController::class);

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
 use App\Entity\CarCategory;
 use App\Form\CarCategoryForm;
 use App\Repository\CarCategoryRepository;
@@ -15,10 +16,9 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CarCategoryController extends AbstractController
 {
     #[Route(name: 'app_car_category_index', methods: ['GET'])]
-    public function index(Request $request, PaginatorInterface $paginator)
+    public function index(Request $request, PaginatorInterface $paginator, CarCategoryRepository $repo): Response
     {
-        $qb = $this->getDoctrine()->getRepository(CarCategory::class)
-            ->createQueryBuilder('c');
+        $qb = $repo->createQueryBuilder('c');
 
         $form = $this->createForm(CarCategoryFilterType::class);
         $form->handleRequest($request);

@@ -16,7 +16,7 @@ class RentalForm extends AbstractType
         $builder
             ->add('rentFrom')
             ->add('rentTo')
-            ->add('client', EntityType::class, [
+            ->add('clients', EntityType::class, [
                 'class' => Client::class,
                 'choice_label' => 'id',
             ])

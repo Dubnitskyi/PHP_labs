@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
 use App\Entity\Rental;
 use App\Form\RentalForm;
 use App\Repository\RentalRepository;
@@ -20,7 +21,7 @@ final class RentalController extends AbstractController
         $qb=$this->getDoctrine()->getRepo(Rental::class)
             ->createQueryBuilder('r')
             ->join('r.car','c')
-            ->join('r.client','cli');
+            ->join('r.clients','cli');
 
         $f=$this->createForm(RentalFilterType::class);
         $f->handleRequest($r);
@@ -32,8 +33,8 @@ final class RentalController extends AbstractController
                 $qb->andWhere('r.rentTo<=:t')->setParameter('t',$d['rentTo']);
             if($f->get('car')->getData())
                 $qb->andWhere('c.model LIKE :m')->setParameter('m','%'.$f->get('car')->getData().'%');
-            if($f->get('client')->getData())
-                $qb->andWhere('cli.fullName LIKE :n')->setParameter('n','%'.$f->get('client')->getData().'%');
+            if($f->get('clients')->getData())
+                $qb->andWhere('cli.fullName LIKE :n')->setParameter('n','%'.$f->get('clients')->getData().'%');
         }
 
         $per=max(1,(int)$r->query->get('itemsPerPage',10));

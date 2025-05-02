@@ -50,7 +50,7 @@ final class RentalControllerTest extends WebTestCase
         $this->client->submitForm('Save', [
             'rental[rentFrom]' => 'Testing',
             'rental[rentTo]' => 'Testing',
-            'rental[client]' => 'Testing',
+            'rental[clients]' => 'Testing',
         ]);
 
         self::assertResponseRedirects($this->path);
@@ -93,7 +93,7 @@ final class RentalControllerTest extends WebTestCase
         $this->client->submitForm('Update', [
             'rental[rentFrom]' => 'Something New',
             'rental[rentTo]' => 'Something New',
-            'rental[client]' => 'Something New',
+            'rental[clients]' => 'Something New',
         ]);
 
         self::assertResponseRedirects('/rental/');

@@ -13,7 +13,7 @@ final class ClientControllerTest extends WebTestCase
     private KernelBrowser $client;
     private EntityManagerInterface $manager;
     private EntityRepository $clientRepository;
-    private string $path = '/client/';
+    private string $path = '/clients/';
 
     protected function setUp(): void
     {
@@ -48,9 +48,9 @@ final class ClientControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
 
         $this->client->submitForm('Save', [
-            'client[fullName]' => 'Testing',
-            'client[phone]' => 'Testing',
-            'client[email]' => 'Testing',
+            'clients[fullName]' => 'Testing',
+            'clients[phone]' => 'Testing',
+            'clients[email]' => 'Testing',
         ]);
 
         self::assertResponseRedirects($this->path);
@@ -91,12 +91,12 @@ final class ClientControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
 
         $this->client->submitForm('Update', [
-            'client[fullName]' => 'Something New',
-            'client[phone]' => 'Something New',
-            'client[email]' => 'Something New',
+            'clients[fullName]' => 'Something New',
+            'clients[phone]' => 'Something New',
+            'clients[email]' => 'Something New',
         ]);
 
-        self::assertResponseRedirects('/client/');
+        self::assertResponseRedirects('/clients/');
 
         $fixture = $this->clientRepository->findAll();
 
@@ -119,7 +119,7 @@ final class ClientControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
         $this->client->submitForm('Delete');
 
-        self::assertResponseRedirects('/client/');
+        self::assertResponseRedirects('/clients/');
         self::assertSame(0, $this->clientRepository->count([]));
     }
 }

@@ -4,7 +4,9 @@ namespace App\Controller;
 
 namespace App\Controller;
 
+
 use App\Entity\Car;
+use App\Repository\CarCategoryRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,15 +15,13 @@ use Symfony\Component\HttpFoundation\Response;
 #[Route('/car')]
 final class CarController extends AbstractController
 {
-    #[Route(name: 'app_car_index', methods: ['GET'])]
-    public function index(Request $r, PaginatorInterface $p)
+    #[Route('', name: 'app_car_index', methods: ['GET'])]
+    public function index(Request $request, PaginatorInterface $paginator, CarCategoryRepository $repo): Response
     {
-        $qb = $this->getDoctrine()->getRepo(Car::class)
-            ->createQueryBuilder('c')
-            ->join('c.category','cat');
+        $qb = $repo->createQueryBuilder('c');
 
         $f = $this->createForm(CarFilterType::class);
-        $f->handleRequest($r);
+        $f->handleRequest($request);
         if ($f->isSubmitted()&&$f->isValid()){
             $d=$f->getData();
             if($d['brand'])  $qb->andWhere('c.brand LIKE :b')->setParameter('b','%'.$d['brand'].'%');
@@ -31,8 +31,8 @@ final class CarController extends AbstractController
                 $qb->andWhere('cat.name LIKE :c')->setParameter('c','%'.$f->get('category')->getData().'%');
         }
 
-        $perPage = max(1,(int)$r->query->get('itemsPerPage',10));
-        $pagi = $p->paginate($qb,$r->query->getInt('page',1),$perPage);
+        $perPage = max(1,(int)$request->query->get('itemsPerPage',10));
+        $pagi = $request->paginate($qb,$request->query->getInt('page',1),$perPage);
 
         return $this->render('cars/index.html.twig',[
             'filterForm'=>$f->createView(),
